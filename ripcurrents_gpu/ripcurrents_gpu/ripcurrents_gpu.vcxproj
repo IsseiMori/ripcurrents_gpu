@@ -116,10 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\opencv4\opencv-4.4.0\build\install\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\opencv4\opencv-4.4.0\build\install\x64\vc16\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\opencv4\opencv-4.4.0\build\install\x64\vc16\lib\opencv_world440.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,16 +133,26 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\opencv4\opencv-4.4.0\build\install\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\opencv4\opencv-4.4.0\build\install\x64\vc16\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\opencv4\opencv-4.4.0\build\install\x64\vc16\lib\opencv_world440.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fn_dir_color.cpp" />
+    <ClCompile Include="method.cpp" />
     <ClCompile Include="ripcurrents_gpu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fn_dir_color.hpp" />
+    <ClInclude Include="method.hpp" />
+    <ClInclude Include="ripcurrents_gpu.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
