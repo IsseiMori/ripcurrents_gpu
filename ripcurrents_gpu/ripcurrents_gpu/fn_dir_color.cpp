@@ -50,7 +50,6 @@ void fn_dir_color::run (int buffer_size) {
 	VideoWriter* video_output_color = ini_video_output (outfile_dir + "_dir_color_" + "_color");
 	VideoWriter* video_output_overlay = ini_video_output (outfile_dir + "_dir_color_" + "_overlay");
 
-	cout << outfile_dir + "_dir_color_" + to_string(buffer_size) + "_color" << endl;
 
 	ini_frame();
 	ini_buffer(buffer_size);
@@ -103,8 +102,8 @@ void fn_dir_color::run (int buffer_size) {
 void fn_dir_color::run_norm (int buffer_size) {
 	cout << "Running color map" << endl;
 
-	VideoWriter* video_output_color = ini_video_output (file_name + "_norm_color_" + to_string(buffer_size) + "_color");
-	VideoWriter* video_output_overlay = ini_video_output (file_name + "_norm_color_" + to_string(buffer_size) + "_overlay");
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "_norm_color_" + "_color");
+	VideoWriter* video_output_overlay = ini_video_output(outfile_dir + "_norm_color_" + "_overlay");
 
 	ini_frame();
 	ini_buffer(buffer_size);
@@ -113,6 +112,8 @@ void fn_dir_color::run_norm (int buffer_size) {
 	for (int framecount = 1; true; ++framecount) {
 
 		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
 
 		calc_FB ();
 
@@ -230,8 +231,8 @@ void find_incoming_dir (Mat& curr, Mat& flow_norm, Mat& out_img) {
 void fn_dir_color::run_norm_filter (int buffer_size, int buffer_size_filter) {
 	cout << "Running color map" << endl;
 
-	VideoWriter* video_output_color = ini_video_output (file_name + "_norm_color_" + to_string(buffer_size) + "_color");
-	VideoWriter* video_output_overlay = ini_video_output (file_name + "_norm_color_" + to_string(buffer_size) + "_overlay");
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "_norm_filter_" + "_color");
+	VideoWriter* video_output_overlay = ini_video_output(outfile_dir + "_norm_filter_" + "_overlay");
 
 	ini_frame();
 	ini_buffer(buffer_size);
@@ -251,6 +252,8 @@ void fn_dir_color::run_norm_filter (int buffer_size, int buffer_size_filter) {
 	for (int framecount = 1; true; ++framecount) {
 
 		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
 
 		calc_FB ();
 
@@ -305,8 +308,8 @@ void fn_dir_color::run_norm_filter (int buffer_size, int buffer_size_filter) {
 void fn_dir_color::run_dir (int buffer_size) {
 	cout << "Running direction only color map" << endl;
 
-	VideoWriter* video_output_color = ini_video_output (file_name + "_dir_only_color_" + to_string(buffer_size) + "_color");
-	VideoWriter* video_output_overlay = ini_video_output (file_name + "_dir_only_color_" + to_string(buffer_size) + "_overlay");
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "_dir_only_color_" + "_color");
+	VideoWriter* video_output_overlay = ini_video_output(outfile_dir + "_dir_only_color_" + "_overlay");
 
 	ini_frame();
 	ini_buffer(buffer_size);
@@ -315,6 +318,8 @@ void fn_dir_color::run_dir (int buffer_size) {
 	for (int framecount = 1; true; ++framecount) {
 
 		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
 
 		calc_FB ();
 

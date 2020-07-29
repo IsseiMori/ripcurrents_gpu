@@ -47,13 +47,13 @@ method::method (string _file_name,
 	width = floor(video.get(cv::CAP_PROP_FRAME_WIDTH) * 
 			height / video.get(cv::CAP_PROP_FRAME_HEIGHT));
 
-	const int numLevels = 4;
+	const int numLevels = 2;
 	const float pyrScale = 0.5;
 	const bool fastPyramids = true;
-	const int winSize = 11;
-	const int numIters = 10;
-	const int polyN = 7; // 5 or 7
-	const float polySigma = 2.4;
+	const int winSize = 5;
+	const int numIters = 3;
+	const int polyN = 5; // 5 or 7
+	const float polySigma = 1.1;
 	dflow = cv::cuda::FarnebackOpticalFlow::create(numLevels, pyrScale, fastPyramids, winSize, numIters, polyN, polySigma);
 			
 }

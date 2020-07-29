@@ -26,6 +26,7 @@
 
 #include "method.hpp"
 #include "fn_dir_color.hpp"
+#include "fn_timeline.hpp"
 
 const int numLevels = 4;
 const float pyrScale = 0.5;
@@ -86,6 +87,26 @@ int main(int argc, char **argv)
 	clock_t start = clock();
 
 	switch (option) {
+
+		// timeline
+		case 0: {
+			cout << "Click two end points of the timeline, then press any key to start" << endl;
+			if (argc < 7) {
+				fn_timeline timeline = fn_timeline(file_name, outfile_dir, 480, 20, 0, 0);
+				timeline.run(false);
+			}
+			else if (argc == 7) {
+				fn_timeline timeline = fn_timeline(file_name, outfile_dir, 480, stoi(argv[4]), stoi(argv[5]), stoi(argv[6]));
+				timeline.run(false);
+			}
+			else if (argc > 7) {
+				fn_timeline timeline = fn_timeline(file_name, outfile_dir, 480, stoi(argv[4]), stoi(argv[5]), stoi(argv[6]));
+				timeline.run(true);
+			}
+			break;
+		}
+
+		// color field
 		case 5: {
 			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
 
@@ -94,6 +115,31 @@ int main(int argc, char **argv)
 			}
 			else {
 				dir_color.run(stoi(argv[4]));
+			}
+			break;
+		}
+
+		// direction only color
+		case 6: {
+			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
+			if (argc < 5) {
+				dir_color.run_dir();
+			}
+			else {
+				dir_color.run_dir(stoi(argv[4]));
+			}
+			break;
+		}
+
+		// normalized flow color
+		case 7: {
+			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
+
+			if (argc < 5) {
+				dir_color.run_norm();
+			}
+			else {
+				dir_color.run_norm(stoi(argv[4]));
 			}
 			break;
 		}
