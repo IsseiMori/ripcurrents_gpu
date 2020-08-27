@@ -145,12 +145,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fn_convert.cpp" />
     <ClCompile Include="fn_dir_color.cpp" />
+    <ClCompile Include="fn_timeline.cpp" />
     <ClCompile Include="method.cpp" />
     <ClCompile Include="ripcurrents_gpu.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fn_convert.hpp" />
     <ClInclude Include="fn_dir_color.hpp" />
+    <ClInclude Include="fn_timeline.hpp" />
     <ClInclude Include="method.hpp" />
     <ClInclude Include="ripcurrents_gpu.hpp" />
   </ItemGroup>

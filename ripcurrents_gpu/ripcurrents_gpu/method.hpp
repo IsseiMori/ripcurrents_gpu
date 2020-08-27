@@ -21,6 +21,7 @@ class method {
 		string outfile_dir;
 		double fps;
 		int total_frame;
+		bool do_resize;
 
 		// frame rgb Mat
 		Mat curr_frame, prev_frame;
@@ -63,9 +64,11 @@ class method {
 
 		void eliminate_std(int sig);
 		void normalize_flow();
+		void flow_mask_ocean(Mat& mask);
 
 		// flow to color
 		void vector_to_color(Mat& curr, Mat& out_img);
+		void vector_to_color2(Mat& curr, Mat& out_img); // xy to GB
 		void vector_to_dir_color(Mat& curr, Mat& out_img);
 
 		// draw helper

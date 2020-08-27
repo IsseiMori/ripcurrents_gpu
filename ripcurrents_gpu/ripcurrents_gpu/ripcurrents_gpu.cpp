@@ -27,6 +27,7 @@
 #include "method.hpp"
 #include "fn_dir_color.hpp"
 #include "fn_timeline.hpp"
+#include "fn_convert.hpp"
 
 const int numLevels = 4;
 const float pyrScale = 0.5;
@@ -88,6 +89,18 @@ int main(int argc, char **argv)
 
 	switch (option) {
 
+		case -1: {
+			if (argc < 5) {
+				fn_convert convert = fn_convert(file_name, outfile_dir, 480);
+				convert.run();
+			}
+			else {
+				fn_convert convert = fn_convert(file_name, outfile_dir, 0);
+				convert.run();
+			}
+			break;
+		}
+
 		// timeline
 		case 0: {
 			cout << "Click two end points of the timeline, then press any key to start" << endl;
@@ -143,6 +156,41 @@ int main(int argc, char **argv)
 			}
 			break;
 		}
+
+		// normalized flow color
+		case 15: {
+			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
+
+			if (argc < 5) {
+				dir_color.run_norm_rgb();
+			}
+			else {
+				dir_color.run_norm_rgb(stoi(argv[4]));
+			}
+			break;
+		}
+
+		// normalized flow color
+		case 16: {
+			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
+
+			if (argc < 5) {
+				dir_color.run_rgb();
+			}
+			else {
+				dir_color.run_rgb(stoi(argv[4]));
+			}
+			break;
+		}
+
+		// normalized flow color with mask
+		case 17: {
+			cout << "normalized flow color with mask" << endl;
+			fn_dir_color dir_color = fn_dir_color(file_name, outfile_dir, 480);
+			cout << argv[4] <<  stoi(argv[5]) << endl;
+			dir_color.run_norm_mask(argv[4], stoi(argv[5]));
+			break;
+		}
 	}
 
 
@@ -153,79 +201,4 @@ int main(int argc, char **argv)
 
 	return 0;
 
-	//std::cout << getBuildInformation() << std::endl;
-	//cuda::printShortCudaDeviceInfo(cuda::getDevice());
-
-	//cuda::GpuMat frame0GPU, frame1GPU, flowGPU;
-	//Mat frame0_rgb, frame1_rgb, frame0, frame1;
-	//Mat flowx, flowy, flow;
-	//int nframes = 0, width = 0, height = 0;
-
-	//// Create OpenCV windows
-	//namedWindow("Dense Flow", WINDOW_AUTOSIZE);
-
-	//// Create the optical flow object
-	//Ptr<cuda::FarnebackOpticalFlow> dflow = cuda::FarnebackOpticalFlow::create(numLevels, pyrScale, fastPyramids, winSize, numIters, polyN, polySigma);
-
-	//VideoCapture cap("E:/ripcurrents/rip_currents_with_breaking_waves/rip_01_fast.mp4");
-	//if (cap.isOpened() == 0) {
-	//	return -1;
-	//}
-
-	//cap >> frame1_rgb;
-
-	//width = frame1_rgb.cols;
-	//height = frame1_rgb.rows;
-
-	//int w, h;
-	//w = 480;
-	//h = (float)height * (float)w / (float)width;
-
-	//resize(frame1_rgb, frame1_rgb, Size(w, h), 0, 0, INTER_LINEAR);
-	//cvtColor(frame1_rgb, frame1, COLOR_BGR2GRAY);
-
-	//while (frame1.empty() == false)
-	//{
-	//	std::cout << nframes << std::endl;
-
-	//	if (nframes >= 1)
-	//	{
-	//		frame0GPU.upload(frame0);
-	//		frame1GPU.upload(frame1);
-
-	//		dflow->calc(frame0GPU, frame1GPU, flowGPU);
-
-	//		cuda::GpuMat planes[2];
-	//		cuda::split(flowGPU, planes);
-	//		planes[0].download(flowx);
-	//		planes[1].download(flowy);
-
-	//		colorizeFlow(flowx, flowy, flow);
-
-	//		imshow("Dense Flow", flow);
-
-	//		waitKey(3);
-
-	//	}
-
-	//	frame1_rgb.copyTo(frame0_rgb);
-	//	resize(frame0_rgb, frame0_rgb, Size(w, h), 0, 0, INTER_LINEAR);
-	//	cvtColor(frame0_rgb, frame0, COLOR_BGR2GRAY);
-
-	//	nframes++;
-
-	//	cap >> frame1_rgb;
-	//	resize(frame1_rgb, frame1_rgb, Size(w, h), 0, 0, INTER_LINEAR);
-
-	//	if (frame1_rgb.empty() == false)
-	//	{
-	//		cvtColor(frame1_rgb, frame1, COLOR_BGR2GRAY);
-	//	}
-	//	else
-	//	{
-	//		break;
-	//	}
-	//}
-
-	//destroyAllWindows();
 }

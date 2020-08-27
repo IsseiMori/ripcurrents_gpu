@@ -43,10 +43,19 @@ method::method (string _file_name,
 	fps = video.get(CAP_PROP_FPS);
 	total_frame = video.get(CAP_PROP_FRAME_COUNT);
 
-	height = _height;
-	width = floor(video.get(cv::CAP_PROP_FRAME_WIDTH) * 
+	if (_height == 0) {
+		height = video.get(cv::CAP_PROP_FRAME_HEIGHT);
+		width = video.get(cv::CAP_PROP_FRAME_WIDTH);
+		do_resize = false;
+	}
+	else {
+		height = _height;
+		width = floor(video.get(cv::CAP_PROP_FRAME_WIDTH) *
 			height / video.get(cv::CAP_PROP_FRAME_HEIGHT));
+		do_resize = true;
+	}
 
+	// calcOpticalFlowFarneback(prev_frame, curr_frame, flow, 0.5, 2, 5, 3, 5, 1.1, OPTFLOW_FARNEBACK_GAUSSIAN);
 	const int numLevels = 2;
 	const float pyrScale = 0.5;
 	const bool fastPyramids = true;
@@ -103,7 +112,7 @@ void method::calc_FB () {
 	// recommended 5 7 1.5
 	// no banding 20 (3) 15 1.2
 	// calcOpticalFlowFarneback(prev_frame, curr_frame, flow, 0.5, 2, 20, 3, 15, 1.2, OPTFLOW_FARNEBACK_GAUSSIAN);
-	// calcOpticalFlowFarneback(prev_frame, curr_frame, flow, 0.5, 2, 5, 3, 5, 1.1, OPTFLOW_FARNEBACK_GAUSSIAN);
+	//calcOpticalFlowFarneback(prev_frame, curr_frame, flow, 0.5, 2, 5, 3, 5, 1.1, OPTFLOW_FARNEBACK_GAUSSIAN);
 
 	prev_frame_d.upload(prev_frame);
 	curr_frame_d.upload(curr_frame);
@@ -155,6 +164,30 @@ void method::normalize_flow() {
 	});
 }
 
+// Mask out flow field using a image set to mask.
+// mask: Black & White image to indicate ocean region. White indicates ocean
+void method::flow_mask_ocean(Mat& mask) {
+
+	for (int row = 0; row < flow.rows; row++) {
+		Pixel2* ptr = flow.ptr<Pixel2>(row, 0);
+		Pixelc* ptr2 = mask.ptr<Pixelc>(row, 0);
+
+		for (int col = 0; col < flow.cols; col++) {
+			float theta = atan2(ptr->y, ptr->x) * 180 / M_PI;	// find angle
+			theta += theta < 0 ? 360 : 0;	// enforce strict positive angle
+
+			if (ptr2->x == 0) {
+				ptr->x = 0;
+				ptr->y = 0;
+			}
+
+			ptr++;
+			ptr2++;
+		}
+	}
+
+}
+
 void method::vector_to_color(Mat& curr, Mat& out_img) {
 
 	static float max_displacement = 0;
@@ -174,8 +207,8 @@ void method::vector_to_color(Mat& curr, Mat& out_img) {
 			// store vector data
 			ptr2->x = theta / 2;
 			ptr2->y = 255;
-			//ptr2->z = sqrt(ptr->x * ptr->x + ptr->y * ptr->y)*128/max_displacement+128;
-            ptr2->z = sqrt(ptr->x * ptr->x + ptr->y * ptr->y)*255/max_displacement;
+			ptr2->z = sqrt(ptr->x * ptr->x + ptr->y * ptr->y)*128/max_displacement+50;
+            //ptr2->z = sqrt(ptr->x * ptr->x + ptr->y * ptr->y)*255/max_displacement;
 			//if ( ptr2->z < 30 ) ptr2->z = 0;
 
 			// store the previous max to maxmin next frame
@@ -194,6 +227,43 @@ void method::vector_to_color(Mat& curr, Mat& out_img) {
 
 	// show as hsv format
 	cvtColor(out_img, out_img, COLOR_HSV2BGR);
+}
+
+float clip(float n, float lower, float upper) {
+	return std::max(lower, std::min(n, upper));
+}
+
+void method::vector_to_color2(Mat& curr, Mat& out_img) {
+
+	static float max_disp_x = 0;
+	static float max_disp_y = 0;
+	float max_disp_x_new = 0;
+	float max_disp_y_new = 0;
+
+	for (int row = 0; row < curr.rows; row++) {
+		Pixel2* ptr = curr.ptr<Pixel2>(row, 0);
+		Pixelc* ptr2 = out_img.ptr<Pixelc>(row, 0);
+
+		for (int col = 0; col < curr.cols; col++) {
+			float theta = atan2(float(ptr->y), float(ptr->x)) * 180 / M_PI;	// find angle
+			theta += theta < 0 ? 360 : 0;	// enforce strict positive angle
+
+			// store vector data
+			ptr2->x = clip(float(ptr->x) > 0 ? abs(ptr->x) / max_disp_x * 128 + 128 : -abs(ptr->x) / max_disp_x * 128 + 128, 0, 255);
+			ptr2->y = clip(float(ptr->y) > 0 ? abs(ptr->y) / max_disp_y * 128 + 128 : -abs(ptr->y) / max_disp_y * 128 + 128, 0, 255);
+			ptr2->z = 0;
+
+			// store the previous max to maxmin next frame
+			if (abs(ptr->x) > max_disp_x_new) max_disp_x_new = abs(ptr->x);
+			if (abs(ptr->y) > max_disp_y_new) max_disp_y_new = abs(ptr->y);
+
+			ptr++;
+			ptr2++;
+		}
+	}
+
+	max_disp_x = max_disp_x_new;
+	max_disp_y = max_disp_y_new;
 }
 
 void method::vector_to_dir_color(Mat& curr, Mat& out_img) {
@@ -215,7 +285,10 @@ void method::vector_to_dir_color(Mat& curr, Mat& out_img) {
 			// store vector data
 			ptr2->x = theta / 2;
 			ptr2->y = 255;
-			ptr2->z = 255;
+
+			// Black for masked out region
+			if (ptr->x == 0) ptr2->z = 0;
+			else ptr2->z = 255;
 			//if ( ptr2->z < 30 ) ptr2->z = 0;
 
 			// store the previous max to maxmin next frame
@@ -249,7 +322,10 @@ int method::read_frame () {
 	curr_frame.copyTo (prev_frame);
 	video.read (frame);
 	if (frame.empty()) return 1;
-	resize (frame, resized_frame, Size(width, height), 0, 0, INTER_LINEAR);
+	
+	if (do_resize) resize(frame, resized_frame, Size(width, height), 0, 0, INTER_LINEAR);
+	else frame.copyTo(resized_frame);
+
 	cvtColor (resized_frame, grayscaled_frame, COLOR_BGR2GRAY);
 	grayscaled_frame.copyTo(curr_frame);
 	return 0;

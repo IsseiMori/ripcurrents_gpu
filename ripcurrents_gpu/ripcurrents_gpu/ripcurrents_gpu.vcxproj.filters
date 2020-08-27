@@ -24,6 +24,12 @@
     <ClCompile Include="fn_dir_color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fn_timeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fn_convert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ripcurrents_gpu.hpp">
@@ -33,6 +39,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="fn_dir_color.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fn_timeline.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fn_convert.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

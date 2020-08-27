@@ -99,6 +99,49 @@ void fn_dir_color::run (int buffer_size) {
 
 }
 
+void fn_dir_color::run_rgb(int buffer_size) {
+	cout << "Running color map" << endl;
+
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "dir_xy");
+
+
+	ini_frame();
+	ini_buffer(buffer_size);
+	ini_draw_colorwheel();
+
+	for (int framecount = 1; true; ++framecount) {
+
+		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
+
+		calc_FB();
+
+		Mat out_img;
+		Mat out_img_overlay;
+		resized_frame.copyTo(out_img);
+
+		eliminate_std(5);
+
+		update_buffer(buffer_size);
+
+		vector_to_color2(average_flow, out_img);
+
+
+		imshow("color map", out_img);
+		video_output_color->write(out_img);
+
+		curr_frame.copyTo(prev_frame);
+		if (waitKey(1) == 27) break;
+
+	}
+
+	// clean up
+	video_output_color->release();
+	destroyAllWindows();
+
+}
+
 void fn_dir_color::run_norm (int buffer_size) {
 	cout << "Running color map" << endl;
 
@@ -150,6 +193,108 @@ void fn_dir_color::run_norm (int buffer_size) {
 	// clean up
 	video_output_color->release();
 	video_output_overlay->release();
+	destroyAllWindows();
+
+}
+
+void fn_dir_color::run_norm_mask(string mask_filename, int buffer_size) {
+	cout << "Running color map" << endl;
+
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "_norm_mask_color_" + "_color");
+	VideoWriter* video_output_overlay = ini_video_output(outfile_dir + "_norm_mask_color_" + "_overlay");
+
+	Mat mask = imread(mask_filename);
+
+	ini_frame();
+	ini_buffer(buffer_size);
+	ini_draw_colorwheel();
+
+	for (int framecount = 1; true; ++framecount) {
+
+		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
+
+		calc_FB();
+
+		Mat out_img;
+		Mat out_img_overlay;
+		resized_frame.copyTo(out_img);
+		resized_frame.copyTo(out_img_overlay);
+
+		eliminate_std(5);
+		// normalize_flow();
+		flow_mask_ocean(mask);
+
+		update_buffer(buffer_size);
+
+		vector_to_color(average_flow, out_img);
+		// vector_to_dir_color(average_flow, out_img);
+		drawFrameCount(out_img, framecount);
+
+
+		addWeighted(out_img, 1.0, out_img_overlay, 1.0, 0.0, out_img_overlay);
+
+		draw_colorwheel(out_img);
+		draw_colorwheel(out_img_overlay);
+
+
+		imshow("grid_buoy color map", out_img);
+		imshow("grid_buoy overlay", out_img_overlay);
+		video_output_color->write(out_img);
+		video_output_overlay->write(out_img_overlay);
+
+		curr_frame.copyTo(prev_frame);
+		if (waitKey(1) == 27) break;
+
+	}
+
+	// clean up
+	video_output_color->release();
+	video_output_overlay->release();
+	destroyAllWindows();
+
+}
+
+void fn_dir_color::run_norm_rgb(int buffer_size) {
+	cout << "Running color map" << endl;
+
+	VideoWriter* video_output_color = ini_video_output(outfile_dir + "_norm_color_rgb");
+
+	ini_frame();
+	ini_buffer(buffer_size);
+	ini_draw_colorwheel();
+
+	for (int framecount = 1; true; ++framecount) {
+
+		if (read_frame()) break;
+
+		cout << "frame: " << framecount << endl;
+
+		calc_FB();
+
+		Mat out_img;
+		Mat out_img_overlay;
+		resized_frame.copyTo(out_img);
+
+		eliminate_std(5);
+		normalize_flow();
+
+		update_buffer(buffer_size);
+
+		vector_to_color2(average_flow, out_img);
+
+
+		imshow("grid_buoy color map", out_img);
+		video_output_color->write(out_img);
+
+		curr_frame.copyTo(prev_frame);
+		if (waitKey(1) == 27) break;
+
+	}
+
+	// clean up
+	video_output_color->release();
 	destroyAllWindows();
 
 }
